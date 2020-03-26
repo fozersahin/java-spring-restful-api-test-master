@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.co.huntersix.spring.rest.dto.PersonDto;
+import uk.co.huntersix.spring.rest.exception.PersonNotFoundException;
 import uk.co.huntersix.spring.rest.model.Person;
 import uk.co.huntersix.spring.rest.referencedata.impl.PersonDataService;
 
@@ -60,7 +61,7 @@ public class PersonControllerTest {
         Person person1 = new Person("Mary", lastname);
         Person person2 = new Person("Brian", lastname);
         when(personDataService.findPersonByLastName(lastname)).thenReturn(Arrays.asList(person1, person2));
-        this.mockMvc.perform(get("/person/lastName/Smith"))
+        this.mockMvc.perform(get("/person/lastname/Smith"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].firstName").value("Mary"))
@@ -73,7 +74,7 @@ public class PersonControllerTest {
         Person person1 = new Person("Mary", lastname);
         Person person2 = new Person("Brian", lastname);
         when(personDataService.findPersonByLastName(lastname)).thenReturn(Arrays.asList(person1, person2));
-        this.mockMvc.perform(get("/person/lastName/Ozersahin"))
+        this.mockMvc.perform(get("/person/lastname/Ozersahin"))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
     }
@@ -105,4 +106,26 @@ public class PersonControllerTest {
     }
 
 
+    @Test
+    public void shouldUpdatePerson() throws Exception {
+        Person person = new Person("Jane", "Smith");
+        person.setId(1L);
+
+        when(personDataService.updateFirstName(1L, "Jane")).thenReturn(person);
+        this.mockMvc.perform(post("/person/1/firstname/Jane")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("firstName").value("Jane"))
+                .andExpect(jsonPath("lastName").value("Smith"));
+    }
+
+    @Test
+    public void shouldFailUpdatePerson() throws Exception {
+        when(personDataService.updateFirstName(100L, "Jane")).thenThrow(new PersonNotFoundException());
+        this.mockMvc.perform(post("/person/100/firstname/Jane"))
+                .andDo(print())
+                .andExpect(status().is4xxClientError());
+    }
 }

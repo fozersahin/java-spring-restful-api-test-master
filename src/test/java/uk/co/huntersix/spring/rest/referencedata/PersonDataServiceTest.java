@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.co.huntersix.spring.rest.exception.PersonNotFoundException;
 import uk.co.huntersix.spring.rest.model.Person;
 import uk.co.huntersix.spring.rest.referencedata.impl.PersonDataService;
 
@@ -37,5 +38,21 @@ public class PersonDataServiceTest {
         personDataService.addPerson(new Person("Bond", "James"));
         List<Person> personList = personDataService.findPerson("Bond", "James");
         assertNotNull(personList);
+    }
+
+    @Test
+    public void updateFirstName() {
+        Person person = personDataService.updateFirstName(new Long(1), "Jane");
+
+        Person person1 = new Person("Jane", "Smith");
+
+        assertEquals(person.getFirstName() , person1.getFirstName());
+        assertEquals(person.getLastName() , person1.getLastName());
+    }
+
+
+    @Test(expected = PersonNotFoundException.class)
+    public void updateFirstName_personNotFound() {
+        Person person = personDataService.updateFirstName(13L, "Jane");
     }
 }

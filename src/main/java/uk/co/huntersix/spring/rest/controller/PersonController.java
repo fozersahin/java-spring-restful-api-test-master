@@ -10,6 +10,7 @@ import uk.co.huntersix.spring.rest.model.Person;
 import uk.co.huntersix.spring.rest.referencedata.impl.PersonDataService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,7 @@ public class PersonController {
     }
 
 
-    @GetMapping("/person/lastName/{lastName}")
+    @GetMapping("/person/lastname/{lastName}")
     public ResponseEntity<List<PersonDto>> findPersonByLastName(@PathVariable(value = "lastName") String lastName) {
 
 
@@ -60,10 +61,18 @@ public class PersonController {
 
     @PostMapping("/person")
     @ResponseStatus(HttpStatus.CREATED)
-    public Long findPersonByLastName(@Valid @RequestBody PersonDto personDto) {
+    public Long addPerson (@Valid @RequestBody PersonDto personDto) {
 
         Person person = new Person(personDto.getFirstName(), personDto.getLastName());
-        return  personDataService.addPerson(person);
+        return personDataService.addPerson(person);
+    }
+
+    @PostMapping("/person/{id}/firstname/{firstName}")
+    @ResponseStatus(HttpStatus.OK)
+    public PersonDto findPersonByLastName(@NotNull @PathVariable(value = "firstName") String firstName,
+                                     @NotNull @PathVariable(value = "id") Long id) {
+        Person person = personDataService.updateFirstName(id, firstName);
+        return new PersonDto(person.getFirstName(), person.getLastName(), person.getId());
     }
 
 }

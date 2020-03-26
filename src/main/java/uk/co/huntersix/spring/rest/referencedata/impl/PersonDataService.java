@@ -1,6 +1,8 @@
 package uk.co.huntersix.spring.rest.referencedata.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import uk.co.huntersix.spring.rest.exception.PersonNotFoundException;
 import uk.co.huntersix.spring.rest.model.Person;
 import uk.co.huntersix.spring.rest.referencedata.IPersonDataService;
 
@@ -38,5 +40,27 @@ public class PersonDataService implements IPersonDataService {
     public Long addPerson(Person person) {
         PERSON_DATA.add(person);
         return person.getId();
+    }
+
+
+    public Person updateFirstName(Long id, String firstName) {
+
+
+        List<Person> personList = PERSON_DATA.stream()
+                .filter(s -> s.getId().equals(id))
+                .collect(Collectors.toList());
+
+        if(CollectionUtils.isEmpty(personList)) {
+            throw new PersonNotFoundException();
+        }
+
+        PERSON_DATA.stream()
+                .filter(s -> s.getId().equals(id))
+                .findFirst()
+                .ifPresent(t -> t.setFirstName(firstName));
+
+        return PERSON_DATA.stream()
+                .filter(p -> p.getId().equals(id))
+                .collect(Collectors.toList()).get(0);
     }
 }
