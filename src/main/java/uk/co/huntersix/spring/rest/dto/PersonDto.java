@@ -1,12 +1,24 @@
 package uk.co.huntersix.spring.rest.dto;
 
 
+import javax.validation.constraints.NotNull;
+
 //Created for response customisation.
 public class PersonDto {
 
+    @NotNull
     private String firstName;
+    @NotNull
     private String lastName;
     private Long id;
+
+    public PersonDto() {
+    }
+
+    public PersonDto(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 
 
     public PersonDto(String firstName, String lastName, Long id) {

@@ -30,7 +30,12 @@ public class PersonDataServiceTest {
     public void findPersonByLastName() {
         List<Person> personList = personDataService.findPersonByLastName("Smith");
         assertNotNull(personList);
+    }
 
-
+    @Test
+    public void addPerson() {
+        personDataService.addPerson(new Person("Bond", "James"));
+        List<Person> personList = personDataService.findPerson("Bond", "James");
+        assertNotNull(personList);
     }
 }

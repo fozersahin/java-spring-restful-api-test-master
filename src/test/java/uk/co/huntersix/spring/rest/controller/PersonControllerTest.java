@@ -1,12 +1,15 @@
 package uk.co.huntersix.spring.rest.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.co.huntersix.spring.rest.dto.PersonDto;
 import uk.co.huntersix.spring.rest.model.Person;
 import uk.co.huntersix.spring.rest.referencedata.impl.PersonDataService;
 
@@ -15,6 +18,7 @@ import java.util.Arrays;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -73,4 +77,32 @@ public class PersonControllerTest {
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
     }
+
+
+    @Test
+    public void shouldAddPerson() throws Exception {
+        PersonDto personDto = new PersonDto("Isaac", "Newman");
+        Person person = new Person("Isaac", "Newman");
+        when(personDataService.addPerson(person)).thenReturn(person.getId());
+        this.mockMvc.perform(post("/person")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(personDto)))
+
+                .andDo(print())
+                .andExpect(status().isCreated());
+    }
+
+
+    @Test
+    public void shouldFailAddPerson() throws Exception {
+        PersonDto personDto = new PersonDto("Isaac", null);
+        this.mockMvc.perform(post("/person")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(personDto)))
+
+                .andDo(print())
+                .andExpect(status().is4xxClientError());
+    }
+
+
 }

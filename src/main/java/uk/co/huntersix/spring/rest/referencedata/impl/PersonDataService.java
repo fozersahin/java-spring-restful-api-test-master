@@ -5,17 +5,18 @@ import uk.co.huntersix.spring.rest.model.Person;
 import uk.co.huntersix.spring.rest.referencedata.IPersonDataService;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class PersonDataService implements IPersonDataService {
 
-    private static final List<Person> PERSON_DATA = Arrays.asList(
+    private static List<Person> PERSON_DATA = new LinkedList<>(Arrays.asList(
             new Person("Mary", "Smith"),
             new Person("Brian", "Archer"),
             new Person("Collin", "Brown"),
-            new Person("Brian", "Smith")
+            new Person("Brian", "Smith"))
     );
 
     @Override
@@ -31,5 +32,11 @@ public class PersonDataService implements IPersonDataService {
         return PERSON_DATA.stream()
                 .filter(p -> p.getLastName().equalsIgnoreCase(lastName))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Long addPerson(Person person) {
+        PERSON_DATA.add(person);
+        return person.getId();
     }
 }

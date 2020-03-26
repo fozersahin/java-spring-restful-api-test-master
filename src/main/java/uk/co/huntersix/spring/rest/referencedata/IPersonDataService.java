@@ -10,4 +10,6 @@ public interface IPersonDataService {
 
     List<Person> findPersonByLastName(String lastName);
 
+    Long addPerson(Person person);
+
 }
