@@ -1,22 +1,18 @@
 package uk.co.huntersix.spring.rest.dto;
 
-import java.util.concurrent.atomic.AtomicLong;
 
+//Created for response customisation.
 public class PersonDto {
-    private static final AtomicLong counter = new AtomicLong();
 
-    private Long id;
     private String firstName;
     private String lastName;
+    private Long id;
 
-    private PersonDto() {
-        // empty
-    }
 
-    public PersonDto(String firstName, String lastName) {
-        this.id = counter.incrementAndGet();
+    public PersonDto(String firstName, String lastName, Long id) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.id = id;
     }
 
     public Long getId() {

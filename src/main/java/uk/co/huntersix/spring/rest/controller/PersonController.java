@@ -3,17 +3,20 @@ package uk.co.huntersix.spring.rest.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import uk.co.huntersix.spring.rest.dto.PersonDto;
 import uk.co.huntersix.spring.rest.model.Person;
-import uk.co.huntersix.spring.rest.referencedata.PersonDataService;
+import uk.co.huntersix.spring.rest.referencedata.impl.PersonDataService;
 
-import javax.xml.ws.Response;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class PersonController {
+
     private PersonDataService personDataService;
 
     public PersonController(@Autowired PersonDataService personDataService) {
@@ -21,19 +24,39 @@ public class PersonController {
     }
 
     @GetMapping("/person/{lastName}/{firstName}")
-    public ResponseEntity<PersonDto> person(@PathVariable(value="lastName") String lastName,
-                                 @PathVariable(value="firstName") String firstName) {
+    public ResponseEntity<List<PersonDto>> person(@PathVariable(value = "lastName") String lastName,
+                                            @PathVariable(value = "firstName") String firstName) {
 
+        List<Person> personList = personDataService.findPerson(lastName, firstName);
 
-        Person person = personDataService.findPerson(lastName, firstName);
-
-        if(person == null) {
-          return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (CollectionUtils.isEmpty(personList)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        PersonDto personDto = new PersonDto(person.getFirstName(),person.getLastName());
+        List<PersonDto> personDtoList = personList.stream().map(
+                s -> new PersonDto(s.getFirstName(), s.getLastName(), s.getId())
+        ).collect(Collectors.toList());
 
 
-        return new ResponseEntity<>(personDto, HttpStatus.OK);
+
+        return new ResponseEntity<>(personDtoList, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/person/lastName/{lastName}")
+    public ResponseEntity<List<PersonDto>> findPersonByLastName(@PathVariable(value = "lastName") String lastName) {
+
+
+        List<Person> personList = personDataService.findPersonByLastName(lastName);
+
+        if (CollectionUtils.isEmpty(personList)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        List<PersonDto> personDtoList = personList.stream().map(
+                s -> new PersonDto(s.getFirstName(), s.getLastName(), s.getId())
+        ).collect(Collectors.toList());
+
+        return new ResponseEntity<>(personDtoList, HttpStatus.OK);
     }
 }
