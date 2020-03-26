@@ -36,4 +36,11 @@ public class PersonControllerTest {
             .andExpect(jsonPath("firstName").value("Mary"))
             .andExpect(jsonPath("lastName").value("Smith"));
     }
+
+    @Test
+    public void shouldReturnNotFoundFromService() throws Exception {
+        this.mockMvc.perform(get("/person/smith/finlay"))
+                .andDo(print())
+                .andExpect(status().is4xxClientError());
+    }
 }
